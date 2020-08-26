@@ -1,29 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:someapp/riverpod/Auth.dart';
 import 'package:someapp/screens/HomeScreen.dart';
 import 'package:someapp/screens/LoginScreen.dart';
-import 'package:someapp/services/AuthService.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final firebaseInit =
+    FutureProvider<FirebaseApp>((ref) => Firebase.initializeApp());
 
 void main() {
   runApp(
-    MaterialApp(
-      title: 'Flutter App',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        cursorColor: Colors.red,
-      ),
-      home: MultiProvider(
-        providers: [
-          StreamProvider<String>(
-            create: (_) => AuthService().authStateChanges(),
-          ),
-          ChangeNotifierProvider(
-            create: (_) => AuthService(),
-          ),
-        ],
-        child: MyApp(),
+    ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter App',
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          cursorColor: Colors.red,
+        ),
+        home: MyApp(),
       ),
     ),
   );
@@ -49,27 +45,47 @@ class MyApp extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: FutureBuilder(
-          future: Firebase.initializeApp(),
-          builder: (_, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  'Error in initializing firebase : ${snapshot.error}',
-                ),
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Consumer(
-                builder: (_, String currentUser, __) {
-                  return (currentUser != null) ? HomeScreen() : LoginScreen();
+        // child: FutureBuilder(
+        //   future: Firebase.initializeApp(),
+        //   builder: (_, snapshot) {
+        //     if (snapshot.hasError) {
+        //       return Center(
+        //         child: Text(
+        //           'Error in initializing firebase : ${snapshot.error}',
+        //         ),
+        //       );
+        //     }
+        //     if (snapshot.connectionState == ConnectionState.done) {
+        //       return Consumer(
+        //         builder: (_, String currentUser, __) {
+        //           return (currentUser != null) ? HomeScreen() : LoginScreen();
+        //         },
+        //       );
+        //     }
+        //     return Center(
+        //       child: CircularProgressIndicator(),
+        //     );
+        //   },
+        // ),
+        child: Center(
+          child: Consumer(
+            builder: (_, watch, __) {
+              return watch(firebaseInit).when(
+                data: (_) {
+                  final currentUser = watch(authStateStream);
+                  return currentUser.when(
+                    data: (user) =>
+                        (user != null) ? HomeScreen() : LoginScreen(),
+                    loading: () => CircularProgressIndicator(),
+                    error: (err, stack) => Text('Error in getting user : $err'),
+                  );
                 },
+                loading: () => CircularProgressIndicator(),
+                error: (err, stack) =>
+                    Text('Error in initializing Firebase : $err'),
               );
-            }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          },
+            },
+          ),
         ),
       ),
     );

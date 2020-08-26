@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:someapp/services/AuthService.dart';
-import 'package:provider/provider.dart';
+import 'package:someapp/riverpod/Auth.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: RaisedButton(
-        onPressed: () => context.read<AuthService>().signOut(),
+        onPressed: () => signOut(),
         child: Text('Sign Out'),
       ),
     );

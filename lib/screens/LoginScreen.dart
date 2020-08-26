@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:someapp/services/AuthService.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:someapp/riverpod/Auth.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final _authTrigger =
-        context.select((AuthService authService) => authService.authTrigger);
+  Widget build(BuildContext context, ScopedReader watch) {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     final TextEditingController _passwordTextController =
         TextEditingController();
     return Center(
-      child: FutureBuilder(
-        future: (_authTrigger)
-            ? context
-                .select((AuthService authService) => authService.authenticate())
-            : null,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return CircularProgressIndicator();
-          else if (snapshot.hasError && _authTrigger)
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${snapshot.error}'),
-                ),
-              );
-            });
-          return LoginScreenContents(
-            formKey: _formKey,
-            passwordTextController: _passwordTextController,
-          );
-        },
-      ),
+      child: (watch(authTriggerProvider).state)
+          ? watch(authFutureProvider).when(
+              data: (_) => LoginScreenContents(
+                formKey: _formKey,
+                passwordTextController: _passwordTextController,
+              ),
+              loading: () => CircularProgressIndicator(),
+              error: (err, stack) {
+                if (watch(authTriggerProvider).state) {
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text('$err')));
+                }
+                return LoginScreenContents(
+                  formKey: _formKey,
+                  passwordTextController: _passwordTextController,
+                );
+              },
+            )
+          : LoginScreenContents(
+              formKey: _formKey,
+              passwordTextController: _passwordTextController,
+            ),
     );
   }
 }
@@ -49,8 +47,6 @@ class LoginScreenContents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _authMode =
-        context.select((AuthService authService) => authService.authMode);
     return Form(
       key: formKey,
       child: FocusScope(
@@ -67,51 +63,63 @@ class LoginScreenContents extends StatelessWidget {
                 passwordTextController: passwordTextController,
               ),
               SomePadding(),
-              (_authMode == AuthMode.SIGNUP)
-                  ? PasswordConfirmTextField(
-                      passwordTextController: passwordTextController)
-                  : Container(),
-              SomePadding(),
-              RaisedButton(
-                color: Theme.of(context).accentColor,
-                child: Text(
-                  '${_authMode == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () => _submitForm(context),
-              ),
-              SomePadding(),
-              RaisedButton(
-                color: Theme.of(context).accentColor,
-                child: Text(
-                  '${_authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  (_authMode == AuthMode.SIGNIN)
-                      ? context.read<AuthService>().setAuthMode =
-                          AuthMode.SIGNUP
-                      : context.read<AuthService>().setAuthMode =
-                          AuthMode.SIGNIN;
+              Consumer(
+                builder: (_, watch, __) {
+                  final authMode = watch(authModeProvider).state;
+                  return (authMode == AuthMode.SIGNUP)
+                      ? PasswordConfirmTextField(
+                          passwordTextController: passwordTextController)
+                      : Container();
                 },
               ),
+              SomePadding(),
+              Consumer(
+                builder: (context, watch, _) {
+                  return RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    child: Text(
+                      '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      if (!formKey.currentState.validate()) return;
+                      formKey.currentState.save();
+                      context.read(authTriggerProvider).state = true;
+                      formKey.currentState.reset();
+                    },
+                  );
+                },
+              ),
+              SomePadding(),
+              Consumer(
+                builder: (context, watch, _) {
+                  final authMode = watch(authModeProvider).state;
+                  return RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    child: Text(
+                      '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () {
+                      (authMode == AuthMode.SIGNIN)
+                          ? context.read(authModeProvider).state =
+                              AuthMode.SIGNUP
+                          : context.read(authModeProvider).state =
+                              AuthMode.SIGNIN;
+                    },
+                  );
+                },
+              )
             ],
           ),
         ),
       ),
     );
-  }
-
-  void _submitForm(BuildContext context) {
-    FocusScope.of(context).requestFocus(new FocusNode());
-    if (!formKey.currentState.validate()) return;
-    formKey.currentState.save();
-    context.read<AuthService>().triggerAuth = true;
-    formKey.currentState.reset();
   }
 }
 
@@ -142,7 +150,7 @@ class EmailTextField extends StatelessWidget {
         if (email.isEmpty) return 'Email cannot be blank';
       },
       onSaved: (String email) {
-        context.read<AuthService>().setEmail = email;
+        context.read(emailProvider).state = email;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -165,7 +173,7 @@ class PasswordTextField extends StatelessWidget {
       ),
       obscureText: true,
       onSaved: (String password) {
-        context.read<AuthService>().setPassword = password;
+        context.read(passwordProvider).state = password;
       },
       controller: passwordTextController,
       // ignore: missing_return
