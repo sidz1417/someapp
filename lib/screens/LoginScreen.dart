@@ -64,34 +64,30 @@ class LoginScreenContents extends StatelessWidget {
               ),
               SomePadding(),
               Consumer(
-                builder: (_, watch, __) {
-                  final authMode = watch(authModeProvider).state;
-                  return (authMode == AuthMode.SIGNUP)
-                      ? PasswordConfirmTextField(
-                          passwordTextController: passwordTextController)
-                      : Container();
-                },
+                builder: (_, watch, __) =>
+                    (watch(authModeProvider).state == AuthMode.SIGNUP)
+                        ? PasswordConfirmTextField(
+                            passwordTextController: passwordTextController)
+                        : Container(),
               ),
               SomePadding(),
               Consumer(
-                builder: (context, watch, _) {
-                  return RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text(
-                      '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                builder: (context, watch, _) => RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  child: Text(
+                    '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
-                    onPressed: () {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                      if (!formKey.currentState.validate()) return;
-                      formKey.currentState.save();
-                      context.read(authTriggerProvider).state = true;
-                      formKey.currentState.reset();
-                    },
-                  );
-                },
+                  ),
+                  onPressed: () {
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                    if (!formKey.currentState.validate()) return;
+                    formKey.currentState.save();
+                    context.read(authTriggerProvider).state = true;
+                    formKey.currentState.reset();
+                  },
+                ),
               ),
               SomePadding(),
               Consumer(
