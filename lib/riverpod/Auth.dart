@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthMode { SIGNIN, SIGNUP }
@@ -10,8 +11,8 @@ final passwordProvider = StateProvider((ref) => '');
 final authModeProvider = StateProvider((ref) => AuthMode.SIGNIN);
 final authTriggerProvider = StateProvider((ref) => false);
 
-final authFutureProvider = FutureProvider<void>(
-  (ref) async {
+final authFutureProvider = FutureProvider.family<void, BuildContext>(
+  (ref, context) async {
     final email = ref.watch(emailProvider).state;
     final password = ref.watch(passwordProvider).state;
     final authMode = ref.watch(authModeProvider).state;
@@ -25,9 +26,15 @@ final authFutureProvider = FutureProvider<void>(
               email: email, password: password);
       }
     } on FirebaseAuthException catch (e) {
-      return Future.error(e.message);
+      if (ref.watch(authTriggerProvider).state)
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+          ),
+        );
     } finally {
       ref.watch(authTriggerProvider).state = false;
+      ref.watch(authModeProvider).state = AuthMode.SIGNIN;
     }
   },
 );

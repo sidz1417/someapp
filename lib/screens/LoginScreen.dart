@@ -10,22 +10,16 @@ class LoginScreen extends ConsumerWidget {
         TextEditingController();
     return Center(
       child: (watch(authTriggerProvider).state)
-          ? watch(authFutureProvider).when(
+          ? watch(authFutureProvider(context)).when(
               data: (_) => LoginScreenContents(
                 formKey: _formKey,
                 passwordTextController: _passwordTextController,
               ),
               loading: () => CircularProgressIndicator(),
-              error: (err, stack) {
-                if (watch(authTriggerProvider).state) {
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('$err')));
-                }
-                return LoginScreenContents(
-                  formKey: _formKey,
-                  passwordTextController: _passwordTextController,
-                );
-              },
+              error: (_, __) => LoginScreenContents(
+                formKey: _formKey,
+                passwordTextController: _passwordTextController,
+              ),
             )
           : LoginScreenContents(
               formKey: _formKey,
@@ -38,6 +32,7 @@ class LoginScreen extends ConsumerWidget {
 class LoginScreenContents extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordTextController;
+
   LoginScreenContents({
     @required this.formKey,
     @required this.passwordTextController,
@@ -156,7 +151,9 @@ class EmailTextField extends StatelessWidget {
 
 class PasswordTextField extends StatelessWidget {
   final TextEditingController passwordTextController;
+
   PasswordTextField({@required this.passwordTextController});
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -185,7 +182,9 @@ class PasswordTextField extends StatelessWidget {
 
 class PasswordConfirmTextField extends StatelessWidget {
   final TextEditingController passwordTextController;
+
   PasswordConfirmTextField({@required this.passwordTextController});
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(

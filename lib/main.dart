@@ -45,28 +45,6 @@ class MyApp extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        // child: FutureBuilder(
-        //   future: Firebase.initializeApp(),
-        //   builder: (_, snapshot) {
-        //     if (snapshot.hasError) {
-        //       return Center(
-        //         child: Text(
-        //           'Error in initializing firebase : ${snapshot.error}',
-        //         ),
-        //       );
-        //     }
-        //     if (snapshot.connectionState == ConnectionState.done) {
-        //       return Consumer(
-        //         builder: (_, String currentUser, __) {
-        //           return (currentUser != null) ? HomeScreen() : LoginScreen();
-        //         },
-        //       );
-        //     }
-        //     return Center(
-        //       child: CircularProgressIndicator(),
-        //     );
-        //   },
-        // ),
         child: Center(
           child: Consumer(
             builder: (_, watch, __) {
