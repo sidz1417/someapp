@@ -6,6 +6,6 @@ Sample Flutter project for firebase.
 
 This project is a sample Flutter application that uses Firebase services.
 
-Will be updated to use more firebase srevices / API changes.
+Will be updated to use more firebase services / API changes.
 
 
