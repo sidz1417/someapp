@@ -110,7 +110,7 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0"
+    version: "0.10.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -211,7 +211,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.0"
+    version: "0.10.0"
   sky_engine:
     dependency: transitive
     description: flutter
