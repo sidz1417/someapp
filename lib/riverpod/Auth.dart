@@ -39,8 +39,16 @@ final authFutureProvider = FutureProvider.family<void, BuildContext>(
   },
 );
 
-final authStateStream = StreamProvider<String>(
-  (ref) => _firebaseAuth.authStateChanges().map((User user) => user?.uid),
+final authStateStream = StreamProvider<User>(
+  (ref) => _firebaseAuth.authStateChanges(),
+);
+
+final isModeratorProvider = FutureProvider.autoDispose<bool>(
+  (ref) async {
+    final idTokenResult = await _firebaseAuth.currentUser.getIdTokenResult();
+    final isModerator = idTokenResult.claims['isModerator'];
+    return (isModerator != null) ? isModerator : false;
+  },
 );
 
 void signOut() {
