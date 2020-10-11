@@ -67,8 +67,7 @@ class LoginScreenContents extends StatelessWidget {
               ),
               SomePadding(),
               Consumer(
-                builder: (context, watch, _) => RaisedButton(
-                  color: Theme.of(context).accentColor,
+                builder: (context, watch, _) => ElevatedButton(
                   child: Text(
                     '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
                     style: TextStyle(
@@ -88,8 +87,7 @@ class LoginScreenContents extends StatelessWidget {
               Consumer(
                 builder: (context, watch, _) {
                   final authMode = watch(authModeProvider).state;
-                  return RaisedButton(
-                    color: Theme.of(context).accentColor,
+                  return ElevatedButton(
                     child: Text(
                       '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
                       style: TextStyle(

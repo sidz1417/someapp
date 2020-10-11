@@ -11,9 +11,12 @@ class HomeScreen extends StatelessWidget {
         Positioned.fill(
           child: CategoryList(),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: ModeratorButtons(),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: ModeratorButtons(),
+          ),
         )
       ],
     );
@@ -49,9 +52,9 @@ class AddCategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      tooltip: 'Add a category',
-      child: Icon(Icons.add),
+    return FloatingActionButton.extended(
+      label: Text('Add category'),
+      // icon: Icon(Icons.add),
       onPressed: () => showDialog(
         context: context,
         builder: (context) {
@@ -63,11 +66,11 @@ class AddCategoryButton extends StatelessWidget {
               decoration: InputDecoration(hintText: 'Enter new category name'),
             ),
             actions: [
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Cancel'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Add'),
                 onPressed: () {
                   createCategory(
@@ -90,9 +93,9 @@ class RemoveCategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      tooltip: 'Remove category',
-      child: Icon(Icons.remove),
+    return FloatingActionButton.extended(
+      label: Text('Remove category'),
+      // tooltip: 'Remove category',
       onPressed: () => showDialog(
         context: context,
         builder: (context) {
@@ -105,11 +108,11 @@ class RemoveCategoryButton extends StatelessWidget {
                   hintText: 'Enter the category name to remove'),
             ),
             actions: [
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Cancel'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Remove'),
                 onPressed: () {
                   removeCategory(
