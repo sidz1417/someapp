@@ -70,7 +70,7 @@ class AddCategoryButton extends StatelessWidget {
               RaisedButton(
                 child: Text('Add'),
                 onPressed: () {
-                  addCategory(
+                  createCategory(
                       pollName: _textEditingController.text, context: context);
                   Navigator.of(context).pop();
                 },

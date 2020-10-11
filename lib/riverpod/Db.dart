@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
@@ -6,10 +9,13 @@ import 'package:someapp/objects/PollCategory.dart';
 
 FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance
   ..settings = Settings(
-    host: kIsWeb ? 'localhost:8080' : '10.0.2.2:8080',
+    host: kIsWeb ? 'localhost:8081' : '10.0.2.2:8081',
     sslEnabled: false,
     persistenceEnabled: false,
   );
+
+FirebaseFunctions _firebaseFunctions = FirebaseFunctions.instance
+  ..useFunctionsEmulator(origin: 'http://localhost:5001');
 
 final categoryStream = StreamProvider.autoDispose<List<PollCategory>>(
   (ref) {
@@ -20,56 +26,42 @@ final categoryStream = StreamProvider.autoDispose<List<PollCategory>>(
 );
 
 void upVote({@required String pollName, @required BuildContext context}) async {
-  final categoryDocRef = _firebaseFirestore.doc('categories/$pollName');
-  await _firebaseFirestore.runTransaction(
-    (transaction) async {
-      try {
-        final categoryDoc = await transaction.get(categoryDocRef);
-        transaction
-            .update(categoryDocRef, {'count': categoryDoc.data()['count'] + 1});
-      } catch (e) {
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$e'),
-          ),
-        );
-      }
-    },
-  );
+  try {
+    await _firebaseFunctions
+        .httpsCallable('upVote')
+        .call(<String, dynamic>{'categoryName': pollName}).timeout(
+            Duration(seconds: 5));
+  } on FirebaseFunctionsException catch (e) {
+    print('cloud function error : ${e.message}');
+  } on TimeoutException catch (e) {
+    print('Timed out , function exceeded ${e.duration.inSeconds} seconds');
+  }
 }
 
-void addCategory(
+void createCategory(
     {@required String pollName, @required BuildContext context}) async {
-  final categoryDocRef = _firebaseFirestore.doc('categories/$pollName');
-  await _firebaseFirestore.runTransaction(
-    (transaction) async {
-      try {
-        transaction.set(categoryDocRef, {'count': 0});
-      } catch (e) {
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$e'),
-          ),
-        );
-      }
-    },
-  );
+  try {
+    await _firebaseFunctions
+        .httpsCallable('createCategory')
+        .call(<String, dynamic>{'categoryName': pollName}).timeout(
+            Duration(seconds: 5));
+  } on FirebaseFunctionsException catch (e) {
+    print('cloud function error : ${e.message}');
+  } on TimeoutException catch (e) {
+    print('Timed out , function exceeded ${e.duration.inSeconds} seconds');
+  }
 }
 
 void removeCategory(
     {@required String pollName, @required BuildContext context}) async {
-  final categoryDocRef = _firebaseFirestore.doc('categories/$pollName');
-  await _firebaseFirestore.runTransaction(
-    (transaction) async {
-      try {
-        transaction.delete(categoryDocRef);
-      } catch (e) {
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$e'),
-          ),
-        );
-      }
-    },
-  );
+  try {
+    await _firebaseFunctions
+        .httpsCallable('removeCategory')
+        .call(<String, dynamic>{'categoryName': pollName}).timeout(
+            Duration(seconds: 5));
+  } on FirebaseFunctionsException catch (e) {
+    print('cloud function error : ${e.message}');
+  } on TimeoutException catch (e) {
+    print('Timed out , function exceeded ${e.duration.inSeconds} seconds');
+  }
 }
