@@ -30,7 +30,7 @@ void upVote({@required String pollName, @required BuildContext context}) async {
     await _firebaseFunctions
         .httpsCallable('upVote')
         .call(<String, dynamic>{'categoryName': pollName}).timeout(
-            Duration(seconds: 5));
+            Duration(seconds: 10));
   } on FirebaseFunctionsException catch (e) {
     print('cloud function error : ${e.message}');
   } on TimeoutException catch (e) {
@@ -44,7 +44,7 @@ void createCategory(
     await _firebaseFunctions
         .httpsCallable('createCategory')
         .call(<String, dynamic>{'categoryName': pollName}).timeout(
-            Duration(seconds: 5));
+            Duration(seconds: 10));
   } on FirebaseFunctionsException catch (e) {
     print('cloud function error : ${e.message}');
   } on TimeoutException catch (e) {
@@ -58,7 +58,7 @@ void removeCategory(
     await _firebaseFunctions
         .httpsCallable('removeCategory')
         .call(<String, dynamic>{'categoryName': pollName}).timeout(
-            Duration(seconds: 5));
+            Duration(seconds: 10));
   } on FirebaseFunctionsException catch (e) {
     print('cloud function error : ${e.message}');
   } on TimeoutException catch (e) {
