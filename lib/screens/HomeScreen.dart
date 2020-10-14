@@ -144,7 +144,8 @@ class CategoryList extends StatelessWidget {
               onTap: () => {
                 upVote(pollName: categoryList[index].pollName, context: context)
               },
-              title: Center(child: Text(categoryList[index].pollName)),
+              title:
+                  Center(child: SelectableText(categoryList[index].pollName)),
               trailing: Text('${categoryList[index].voteCount}'),
             ),
           ),
