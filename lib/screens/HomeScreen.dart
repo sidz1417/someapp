@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
-import 'package:someapp/riverpod/db.dart';
+import 'package:someapp/riverpod/Db.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -12,10 +12,19 @@ class HomeScreen extends StatelessWidget {
           child: CategoryList(),
         ),
         Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: const EdgeInsets.only(bottom: 60.0),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: ModeratorButtons(),
+            child: Consumer(
+              builder: (BuildContext context,
+                  T Function<T>(ProviderBase<Object, T>) watch, _) {
+                return watch(modTrigger).state
+                    ? watch(modFutureProvider(context)).maybeWhen(
+                        orElse: () => ModeratorButtons(),
+                      )
+                    : ModeratorButtons();
+              },
+            ),
           ),
         )
       ],
@@ -73,8 +82,10 @@ class AddCategoryButton extends StatelessWidget {
               ElevatedButton(
                 child: Text('Add'),
                 onPressed: () {
-                  createCategory(
-                      pollName: _textEditingController.text, context: context);
+                  context.read(pollNameProvider).state =
+                      _textEditingController.text;
+                  context.read(modModeProvider).state = ModMode.CREATE;
+                  context.read(modTrigger).state = true;
                   Navigator.of(context).pop();
                 },
               ),
@@ -115,8 +126,10 @@ class RemoveCategoryButton extends StatelessWidget {
               ElevatedButton(
                 child: Text('Remove'),
                 onPressed: () {
-                  removeCategory(
-                      pollName: _textEditingController.text, context: context);
+                  context.read(pollNameProvider).state =
+                      _textEditingController.text;
+                  context.read(modModeProvider).state = ModMode.REMOVE;
+                  context.read(modTrigger).state = true;
                   Navigator.of(context).pop();
                 },
               ),
@@ -141,8 +154,9 @@ class CategoryList extends StatelessWidget {
           itemCount: categoryList.length,
           itemBuilder: (_, index) => Card(
             child: ListTile(
-              onTap: () => {
-                upVote(pollName: categoryList[index].pollName, context: context)
+              onTap: () {
+                upVote(
+                    pollName: categoryList[index].pollName, context: context);
               },
               title: Center(child: Text(categoryList[index].pollName)),
               trailing: Text('${categoryList[index].voteCount}'),
