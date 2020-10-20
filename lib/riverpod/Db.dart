@@ -47,23 +47,27 @@ final modFutureProvider = FutureProvider.family<void, BuildContext>(
   (ref, context) async {
     final modMode = ref.watch(modModeProvider).state;
     final pollName = ref.watch(pollNameProvider).state;
+    final _modTrigger = ref.watch(modTrigger).state;
     try {
-      switch (modMode) {
-        case ModMode.CREATE:
-          return await _firebaseFunctions
-              .httpsCallable('createCategory',
-                  options: HttpsCallableOptions(timeout: Duration(seconds: 5)))
-              .call(<String, dynamic>{'categoryName': pollName});
-        case ModMode.REMOVE:
-          return await _firebaseFunctions
-              .httpsCallable(
-            'removeCategory',
-            options: HttpsCallableOptions(timeout: Duration(seconds: 5)),
-          )
-              .call(<String, dynamic>{'categoryName': pollName});
-        case ModMode.NONE:
-          // TODO: Handle this case.
-          break;
+      if (_modTrigger) {
+        switch (modMode) {
+          case ModMode.CREATE:
+            return await _firebaseFunctions
+                .httpsCallable('createCategory',
+                    options:
+                        HttpsCallableOptions(timeout: Duration(seconds: 5)))
+                .call(<String, dynamic>{'categoryName': pollName});
+          case ModMode.REMOVE:
+            return await _firebaseFunctions
+                .httpsCallable(
+              'removeCategory',
+              options: HttpsCallableOptions(timeout: Duration(seconds: 5)),
+            )
+                .call(<String, dynamic>{'categoryName': pollName});
+          case ModMode.NONE:
+            // TODO: Handle this case.
+            break;
+        }
       }
     } on FirebaseFunctionsException catch (e) {
       Scaffold.of(context)
@@ -71,12 +75,6 @@ final modFutureProvider = FutureProvider.family<void, BuildContext>(
     } catch (e) {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text('Exception $e occurred')));
-    } finally {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.watch(modModeProvider).state = ModMode.NONE;
-        ref.watch(pollNameProvider).state = '';
-        ref.watch(modTrigger).state = false;
-      });
     }
   },
 );

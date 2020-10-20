@@ -35,6 +35,8 @@ final authFutureProvider = FutureProvider.family<void, BuildContext>(
     } finally {
       ref.watch(authTriggerProvider).state = false;
       ref.watch(authModeProvider).state = AuthMode.SIGNIN;
+      ref.watch(emailProvider).state = '';
+      ref.watch(passwordProvider).state = '';
     }
   },
 );
