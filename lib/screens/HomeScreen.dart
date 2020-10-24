@@ -2,32 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
 import 'package:someapp/riverpod/Db.dart';
+import 'package:someapp/utils/AboutDialogButton.dart';
+import 'package:someapp/utils/SignOutButton.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: CategoryList(),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 60.0),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Consumer(
-              builder: (BuildContext context,
-                  T Function<T>(ProviderBase<Object, T>) watch, _) {
-                return watch(modTrigger).state
-                    ? watch(modFutureProvider(context)).maybeWhen(
-                        orElse: () => ModeratorButtons(),
-                      )
-                    : ModeratorButtons();
-              },
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter App'),
+        centerTitle: true,
+        leading: AboutDialogButton(),
+        actions: [
+          SignOutButton(),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CategoryList(),
           ),
-        )
-      ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 60.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Consumer(
+                builder: (BuildContext context,
+                    T Function<T>(ProviderBase<Object, T>) watch, _) {
+                  return watch(modTrigger).state
+                      ? watch(modFutureProvider(context)).maybeWhen(
+                          orElse: () => ModeratorButtons(),
+                        )
+                      : ModeratorButtons();
+                },
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
