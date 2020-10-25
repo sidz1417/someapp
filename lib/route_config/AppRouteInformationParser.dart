@@ -6,20 +6,13 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
   Future<AppRoute> parseRouteInformation(
       RouteInformation routeInformation) async {
     final uri = Uri.parse(routeInformation.location);
-    final pathSegments = uri.pathSegments;
-    if (pathSegments.length == 0) return AppRoute.home();
-    if (pathSegments.length == 1) {
-      if (pathSegments[0] == 'login') return AppRoute.home();
-      return AppRoute.unknown();
-    }
+    if (uri.pathSegments.length == 0) return AppRoute.home();
     return AppRoute.unknown();
   }
 
   @override
   RouteInformation restoreRouteInformation(AppRoute configuration) {
-    if (configuration.isUnknown)
-      return RouteInformation(location: '/404');
-    if (!configuration.isLoggedIn) return RouteInformation(location: '/login');
+    if (configuration.isUnknown) return RouteInformation(location: '/404');
     return RouteInformation(location: '/');
   }
 }

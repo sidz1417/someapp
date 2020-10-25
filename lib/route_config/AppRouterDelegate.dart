@@ -24,7 +24,6 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   Future<void> setNewRoutePath(AppRoute configuration) async {
     if (configuration.isUnknown) {
       _show404 = true;
-      // notifyListeners();
       return;
     }
     _isLoggedIn = configuration.isLoggedIn;
