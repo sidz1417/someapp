@@ -5,6 +5,7 @@ import 'package:someapp/route_config/AppRoute.dart';
 import 'package:someapp/screens/HomeScreen.dart';
 import 'package:someapp/screens/LoginScreen.dart';
 import 'package:someapp/screens/UnknownScreen.dart';
+import 'package:someapp/utils/AboutDialogButton.dart';
 
 class AppRouterDelegate extends RouterDelegate<AppRoute>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<AppRoute> {
@@ -45,7 +46,16 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
                 else if (_isLoggedIn)
                   MaterialPage(child: HomeScreen())
                 else if (!_isLoggedIn)
-                  MaterialPage(child: LoginScreen())
+                  MaterialPage(
+                    child: Scaffold(
+                      appBar: AppBar(
+                        title: Text('Flutter App'),
+                        centerTitle: true,
+                        leading: AboutDialogButton(),
+                      ),
+                      body: LoginScreen(),
+                    ),
+                  )
               ],
               onPopPage: (route, result) {
                 if (!route.didPop(result)) return false;

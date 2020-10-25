@@ -43,7 +43,7 @@ enum ModMode { CREATE, REMOVE, NONE }
 final modModeProvider = StateProvider((ref) => ModMode.NONE);
 final modTrigger = StateProvider((ref) => false);
 final pollNameProvider = StateProvider((ref) => '');
-final modFutureProvider = FutureProvider.family<void, BuildContext>(
+final modFutureProvider = FutureProvider.family.autoDispose<void, BuildContext>(
   (ref, context) async {
     final modMode = ref.watch(modModeProvider).state;
     final pollName = ref.watch(pollNameProvider).state;
@@ -75,6 +75,13 @@ final modFutureProvider = FutureProvider.family<void, BuildContext>(
     } catch (e) {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text('Exception $e occurred')));
+    } finally {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final modMode = ref.watch(modModeProvider).state;
+        if (modMode != ModMode.NONE) {
+          ref.watch(modModeProvider).state = ModMode.NONE;
+        }
+      });
     }
   },
 );

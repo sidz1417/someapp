@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
-import 'package:someapp/utils/AboutDialogButton.dart';
 
 class LoginScreen extends ConsumerWidget {
   @override
@@ -9,30 +8,23 @@ class LoginScreen extends ConsumerWidget {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     final TextEditingController _passwordTextController =
         TextEditingController();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter App'),
-        centerTitle: true,
-        leading: AboutDialogButton(),
-      ),
-      body: Center(
-        child: (watch(authTriggerProvider).state)
-            ? watch(authFutureProvider(context)).when(
-                data: (_) => LoginScreenContents(
-                  formKey: _formKey,
-                  passwordTextController: _passwordTextController,
-                ),
-                loading: () => CircularProgressIndicator(),
-                error: (_, __) => LoginScreenContents(
-                  formKey: _formKey,
-                  passwordTextController: _passwordTextController,
-                ),
-              )
-            : LoginScreenContents(
+    return Center(
+      child: (watch(authTriggerProvider).state)
+          ? watch(authFutureProvider(context)).when(
+              data: (_) => LoginScreenContents(
                 formKey: _formKey,
                 passwordTextController: _passwordTextController,
               ),
-      ),
+              loading: () => CircularProgressIndicator(),
+              error: (_, __) => LoginScreenContents(
+                formKey: _formKey,
+                passwordTextController: _passwordTextController,
+              ),
+            )
+          : LoginScreenContents(
+              formKey: _formKey,
+              passwordTextController: _passwordTextController,
+            ),
     );
   }
 }
