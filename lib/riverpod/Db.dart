@@ -76,12 +76,10 @@ final modFutureProvider = FutureProvider.family.autoDispose<void, BuildContext>(
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text('Exception $e occurred')));
     } finally {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final modMode = ref.watch(modModeProvider).state;
-        if (modMode != ModMode.NONE) {
-          ref.watch(modModeProvider).state = ModMode.NONE;
-        }
-      });
+      final modMode = ref.watch(modModeProvider).state;
+      if (modMode != ModMode.NONE) {
+        ref.watch(modModeProvider).state = ModMode.NONE;
+      }
     }
   },
 );
