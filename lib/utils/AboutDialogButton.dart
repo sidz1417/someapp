@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AboutDialogButton extends StatelessWidget {
   const AboutDialogButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

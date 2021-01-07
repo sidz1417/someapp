@@ -3,9 +3,9 @@ import 'package:flutter/cupertino.dart';
 
 class PollCategory {
   final String pollName;
-  final int voteCount;
+  final int? voteCount;
 
-  PollCategory({@required this.pollName, @required this.voteCount});
+  PollCategory({required this.pollName, required this.voteCount});
 
   factory PollCategory.fromDb(DocumentSnapshot documentSnapshot) {
     final data = documentSnapshot.data();

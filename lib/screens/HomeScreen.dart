@@ -27,8 +27,7 @@ class HomeScreen extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Consumer(
-                builder: (BuildContext context,
-                    T Function<T>(ProviderBase<Object, T>) watch, _) {
+                builder: (context, watch, _) {
                   return watch(modTrigger).state
                       ? watch(modFutureProvider(context)).maybeWhen(
                           orElse: () => ModeratorButtons(),
@@ -46,29 +45,29 @@ class HomeScreen extends StatelessWidget {
 
 class ModeratorButtons extends StatelessWidget {
   const ModeratorButtons({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(isModeratorProvider).when(
-        data: (isModerator) => isModerator
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [AddCategoryButton(), RemoveCategoryButton()],
-              )
-            : Container(),
-        loading: () => Container(),
-        error: (_, __) => Container(),
-      ),
+      builder: ((_, watch, __) => watch(isModeratorProvider).when(
+            data: (isModerator) => isModerator
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [AddCategoryButton(), RemoveCategoryButton()],
+                  )
+                : Container(),
+            loading: () => Container(),
+            error: (_, __) => Container(),
+          )),
     );
   }
 }
 
 class AddCategoryButton extends StatelessWidget {
   const AddCategoryButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -111,7 +110,7 @@ class AddCategoryButton extends StatelessWidget {
 
 class RemoveCategoryButton extends StatelessWidget {
   const RemoveCategoryButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -155,29 +154,30 @@ class RemoveCategoryButton extends StatelessWidget {
 
 class CategoryList extends StatelessWidget {
   const CategoryList({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(categoryStream).when(
-        data: (categoryList) => ListView.builder(
-          itemCount: categoryList.length,
-          itemBuilder: (_, index) => Card(
-            child: ListTile(
-              onTap: () {
-                upVote(
-                    pollName: categoryList[index].pollName, context: context);
-              },
-              title: Center(child: Text(categoryList[index].pollName)),
-              trailing: Text('${categoryList[index].voteCount}'),
+      builder: ((_, watch, __) => watch(categoryStream).when(
+            data: (categoryList) => ListView.builder(
+              itemCount: categoryList.length,
+              itemBuilder: (_, index) => Card(
+                child: ListTile(
+                  onTap: () {
+                    upVote(
+                        pollName: categoryList[index].pollName,
+                        context: context);
+                  },
+                  title: Center(child: Text(categoryList[index].pollName)),
+                  trailing: Text('${categoryList[index].voteCount}'),
+                ),
+              ),
             ),
-          ),
-        ),
-        loading: () => Center(child: CircularProgressIndicator()),
-        error: (e, _) => Text('Error getting data : $e'),
-      ),
+            loading: () => Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Error getting data : $e'),
+          )),
     );
   }
 }

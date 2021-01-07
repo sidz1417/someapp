@@ -1,5 +1,5 @@
 class AppRoute {
-  bool isLoggedIn;
+  late bool isLoggedIn;
   final bool isUnknown;
 
   AppRoute.login()

@@ -34,8 +34,8 @@ class LoginScreenContents extends StatelessWidget {
   final TextEditingController passwordTextController;
 
   LoginScreenContents({
-    @required this.formKey,
-    @required this.passwordTextController,
+    required this.formKey,
+    required this.passwordTextController,
   });
 
   final FocusScopeNode focusScopeNode = FocusScopeNode();
@@ -46,9 +46,7 @@ class LoginScreenContents extends StatelessWidget {
       key: formKey,
       child: FocusScope(
         node: focusScopeNode,
-        child: Container(
-          height: 400,
-          width: 300,
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -76,10 +74,10 @@ class LoginScreenContents extends StatelessWidget {
                   ),
                   onPressed: () {
                     FocusScope.of(context).requestFocus(new FocusNode());
-                    if (!formKey.currentState.validate()) return;
-                    formKey.currentState.save();
+                    if (!formKey.currentState!.validate()) return;
+                    formKey.currentState!.save();
                     context.read(authTriggerProvider).state = true;
-                    formKey.currentState.reset();
+                    formKey.currentState!.reset();
                   },
                 ),
               ),
@@ -135,10 +133,10 @@ class EmailTextField extends StatelessWidget {
       ),
       keyboardType: TextInputType.emailAddress,
       // ignore: missing_return
-      validator: (String email) {
-        if (email.isEmpty) return 'Email cannot be blank';
+      validator: (email) {
+        if (email != null && email.isEmpty) return 'Email cannot be blank';
       },
-      onSaved: (String email) {
+      onSaved: (String? email) {
         context.read(emailProvider).state = email;
       },
       textInputAction: TextInputAction.next,
@@ -150,7 +148,7 @@ class EmailTextField extends StatelessWidget {
 class PasswordTextField extends StatelessWidget {
   final TextEditingController passwordTextController;
 
-  PasswordTextField({@required this.passwordTextController});
+  PasswordTextField({required this.passwordTextController});
 
   @override
   Widget build(BuildContext context) {
@@ -163,13 +161,13 @@ class PasswordTextField extends StatelessWidget {
         labelStyle: TextStyle(color: Theme.of(context).accentColor),
       ),
       obscureText: true,
-      onSaved: (String password) {
+      onSaved: (String? password) {
         context.read(passwordProvider).state = password;
       },
       controller: passwordTextController,
       // ignore: missing_return
-      validator: (String password) {
-        if (password.isEmpty || password.length < 6)
+      validator: (String? password) {
+        if (password == null || password.length < 6)
           return "Minimum password length is 6";
       },
       textInputAction: TextInputAction.next,
@@ -181,7 +179,7 @@ class PasswordTextField extends StatelessWidget {
 class PasswordConfirmTextField extends StatelessWidget {
   final TextEditingController passwordTextController;
 
-  PasswordConfirmTextField({@required this.passwordTextController});
+  PasswordConfirmTextField({required this.passwordTextController});
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +193,7 @@ class PasswordConfirmTextField extends StatelessWidget {
       ),
       obscureText: true,
       // ignore: missing_return
-      validator: (String password) {
+      validator: (String? password) {
         if (passwordTextController.text != password)
           return 'Passwords do not match';
       },

@@ -4,7 +4,7 @@ import 'package:someapp/riverpod/Auth.dart';
 
 class SignOutButton extends StatelessWidget {
   const SignOutButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

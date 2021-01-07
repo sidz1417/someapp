@@ -5,9 +5,11 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
   @override
   Future<AppRoute> parseRouteInformation(
       RouteInformation routeInformation) async {
-    final uri = Uri.parse(routeInformation.location);
+    final uri = Uri.parse(routeInformation.location!);
     if (uri.pathSegments.length == 0) return AppRoute.home();
     return AppRoute.unknown();
+    // if (routeInformation.location == null) return AppRoute.home();
+    // return AppRoute.unknown();
   }
 
   @override

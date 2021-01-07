@@ -9,7 +9,9 @@ import 'package:someapp/objects/PollCategory.dart';
 
 FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance
   ..settings = Settings(
-    host: kIsWeb ? 'localhost:8081' : '10.0.2.2:8081',
+    host: (defaultTargetPlatform == TargetPlatform.android
+        ? '10.0.2.2:8080'
+        : 'localhost:8080'),
     sslEnabled: false,
     persistenceEnabled: false,
   );
@@ -25,7 +27,7 @@ final categoryStream = StreamProvider.autoDispose<List<PollCategory>>(
   },
 );
 
-void upVote({@required String pollName, @required BuildContext context}) async {
+void upVote({required String pollName, required BuildContext context}) async {
   try {
     await _firebaseFunctions
         .httpsCallable('upVote',
@@ -34,7 +36,7 @@ void upVote({@required String pollName, @required BuildContext context}) async {
   } on FirebaseFunctionsException catch (e) {
     print('cloud function error : ${e.message}');
   } on TimeoutException catch (e) {
-    print('Timed out , function exceeded ${e.duration.inSeconds} seconds');
+    print('Timed out , function exceeded ${e.duration!.inSeconds} seconds');
   }
 }
 
@@ -43,7 +45,8 @@ enum ModMode { CREATE, REMOVE, NONE }
 final modModeProvider = StateProvider((ref) => ModMode.NONE);
 final modTrigger = StateProvider((ref) => false);
 final pollNameProvider = StateProvider((ref) => '');
-final modFutureProvider = FutureProvider.family.autoDispose<void, BuildContext>(
+final modFutureProvider =
+    FutureProvider.family.autoDispose<HttpsCallableResult?, BuildContext>(
   (ref, context) async {
     final modMode = ref.watch(modModeProvider).state;
     final pollName = ref.watch(pollNameProvider).state;
@@ -65,15 +68,14 @@ final modFutureProvider = FutureProvider.family.autoDispose<void, BuildContext>(
             )
                 .call(<String, dynamic>{'categoryName': pollName});
           case ModMode.NONE:
-            // TODO: Handle this case.
             break;
         }
       }
     } on FirebaseFunctionsException catch (e) {
-      Scaffold.of(context)
+      ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('${e.message}')));
     } catch (e) {
-      Scaffold.of(context)
+      ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Exception $e occurred')));
     } finally {
       final modMode = ref.watch(modModeProvider).state;
