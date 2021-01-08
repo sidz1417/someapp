@@ -1,53 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
-import 'package:someapp/riverpod/db.dart';
+import 'package:someapp/riverpod/Db.dart';
+import 'package:someapp/utils/AboutDialogButton.dart';
+import 'package:someapp/utils/SignOutButton.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: CategoryList(),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: ModeratorButtons(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter App'),
+        centerTitle: true,
+        leading: AboutDialogButton(),
+        actions: [
+          SignOutButton(),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CategoryList(),
           ),
-        )
-      ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 60.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Consumer(
+                builder: (context, watch, _) {
+                  return watch(modTrigger).state
+                      ? watch(modFutureProvider(context)).maybeWhen(
+                          orElse: () => ModeratorButtons(),
+                        )
+                      : ModeratorButtons();
+                },
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
 
 class ModeratorButtons extends StatelessWidget {
   const ModeratorButtons({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(isModeratorProvider).when(
-        data: (isModerator) => isModerator
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [AddCategoryButton(), RemoveCategoryButton()],
-              )
-            : Container(),
-        loading: () => Container(),
-        error: (_, __) => Container(),
-      ),
+      builder: ((_, watch, __) => watch(isModeratorProvider).when(
+            data: (isModerator) => isModerator
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [AddCategoryButton(), RemoveCategoryButton()],
+                  )
+                : Container(),
+            loading: () => Container(),
+            error: (_, __) => Container(),
+          )),
     );
   }
 }
 
 class AddCategoryButton extends StatelessWidget {
   const AddCategoryButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -73,8 +93,10 @@ class AddCategoryButton extends StatelessWidget {
               ElevatedButton(
                 child: Text('Add'),
                 onPressed: () {
-                  createCategory(
-                      pollName: _textEditingController.text, context: context);
+                  context.read(pollNameProvider).state =
+                      _textEditingController.text;
+                  context.read(modModeProvider).state = ModMode.CREATE;
+                  context.read(modTrigger).state = true;
                   Navigator.of(context).pop();
                 },
               ),
@@ -88,7 +110,7 @@ class AddCategoryButton extends StatelessWidget {
 
 class RemoveCategoryButton extends StatelessWidget {
   const RemoveCategoryButton({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -115,8 +137,10 @@ class RemoveCategoryButton extends StatelessWidget {
               ElevatedButton(
                 child: Text('Remove'),
                 onPressed: () {
-                  removeCategory(
-                      pollName: _textEditingController.text, context: context);
+                  context.read(pollNameProvider).state =
+                      _textEditingController.text;
+                  context.read(modModeProvider).state = ModMode.REMOVE;
+                  context.read(modTrigger).state = true;
                   Navigator.of(context).pop();
                 },
               ),
@@ -130,28 +154,30 @@ class RemoveCategoryButton extends StatelessWidget {
 
 class CategoryList extends StatelessWidget {
   const CategoryList({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(categoryStream).when(
-        data: (categoryList) => ListView.builder(
-          itemCount: categoryList.length,
-          itemBuilder: (_, index) => Card(
-            child: ListTile(
-              onTap: () => {
-                upVote(pollName: categoryList[index].pollName, context: context)
-              },
-              title: Center(child: Text(categoryList[index].pollName)),
-              trailing: Text('${categoryList[index].voteCount}'),
+      builder: ((_, watch, __) => watch(categoryStream).when(
+            data: (categoryList) => ListView.builder(
+              itemCount: categoryList.length,
+              itemBuilder: (_, index) => Card(
+                child: ListTile(
+                  onTap: () {
+                    upVote(
+                        pollName: categoryList[index].pollName,
+                        context: context);
+                  },
+                  title: Center(child: Text(categoryList[index].pollName)),
+                  trailing: Text('${categoryList[index].voteCount}'),
+                ),
+              ),
             ),
-          ),
-        ),
-        loading: () => Center(child: CircularProgressIndicator()),
-        error: (e, _) => Text('Error getting data : $e'),
-      ),
+            loading: () => Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Error getting data : $e'),
+          )),
     );
   }
 }

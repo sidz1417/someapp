@@ -11,7 +11,7 @@ final passwordProvider = StateProvider((ref) => '');
 final authModeProvider = StateProvider((ref) => AuthMode.SIGNIN);
 final authTriggerProvider = StateProvider((ref) => false);
 
-final authFutureProvider = FutureProvider.family<void, BuildContext>(
+final authFutureProvider = FutureProvider.family<UserCredential?, BuildContext>(
   (ref, context) async {
     final email = ref.watch(emailProvider).state;
     final password = ref.watch(passwordProvider).state;
@@ -27,7 +27,7 @@ final authFutureProvider = FutureProvider.family<void, BuildContext>(
       }
     } on FirebaseAuthException catch (e) {
       if (ref.watch(authTriggerProvider).state)
-        Scaffold.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.message),
           ),
@@ -35,11 +35,13 @@ final authFutureProvider = FutureProvider.family<void, BuildContext>(
     } finally {
       ref.watch(authTriggerProvider).state = false;
       ref.watch(authModeProvider).state = AuthMode.SIGNIN;
+      ref.watch(emailProvider).state = '';
+      ref.watch(passwordProvider).state = '';
     }
   },
 );
 
-final authStateStream = StreamProvider<User>(
+final authStateStream = StreamProvider<User?>(
   (ref) => _firebaseAuth.authStateChanges(),
 );
 
