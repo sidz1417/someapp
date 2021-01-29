@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
@@ -10,15 +11,21 @@ class LoginScreen extends ConsumerWidget {
         TextEditingController();
     return Center(
       child: (watch(authTriggerProvider).state)
-          ? watch(authFutureProvider(context)).when(
-              data: (_) => LoginScreenContents(
-                formKey: _formKey,
-                passwordTextController: _passwordTextController,
-              ),
-              loading: () => CircularProgressIndicator(),
-              error: (_, __) => LoginScreenContents(
-                formKey: _formKey,
-                passwordTextController: _passwordTextController,
+          ? ProviderListener(
+              provider: authMethodProvider.future,
+              onChange:
+                  (BuildContext context, Future<Object> authMethod) async {
+                final returnVal = await authMethod;
+                if (returnVal is FirebaseAuthException)
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text(returnVal.message)));
+              },
+              child: watch(authMethodProvider).maybeWhen(
+                loading: () => CircularProgressIndicator(),
+                orElse: () => LoginScreenContents(
+                  formKey: _formKey,
+                  passwordTextController: _passwordTextController,
+                ),
               ),
             )
           : LoginScreenContents(
@@ -68,6 +75,7 @@ class LoginScreenContents extends StatelessWidget {
               SomePadding(),
               Consumer(
                 builder: (context, watch, _) => ElevatedButton(
+                  key: Key('AuthButton'),
                   child: Text(
                     '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
                     style: TextStyle(
@@ -88,6 +96,7 @@ class LoginScreenContents extends StatelessWidget {
                 builder: (context, watch, _) {
                   final authMode = watch(authModeProvider).state;
                   return ElevatedButton(
+                    key: Key('AuthToggleButton'),
                     child: Text(
                       '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
                       style: TextStyle(

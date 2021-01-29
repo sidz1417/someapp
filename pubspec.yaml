@@ -12,15 +12,17 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^0.5.1
-  firebase_auth: ^0.18.2
+  firebase_core: ^0.7.0
+  firebase_auth: ^0.20.0+1 
   flutter_riverpod: ^0.12.1
-  cloud_firestore: ^0.14.2
-  cloud_functions: ^0.7.0-dev.3
+  cloud_firestore: ^0.16.0
+  cloud_functions: ^0.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+  mockito:
 
 flutter:
   uses-material-design: true

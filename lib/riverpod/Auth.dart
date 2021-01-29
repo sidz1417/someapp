@@ -1,58 +1,52 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthMode { SIGNIN, SIGNUP }
-
-FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
 final emailProvider = StateProvider((ref) => '');
 final passwordProvider = StateProvider((ref) => '');
 final authModeProvider = StateProvider((ref) => AuthMode.SIGNIN);
 final authTriggerProvider = StateProvider((ref) => false);
 
-final authFutureProvider = FutureProvider.family<void, BuildContext>(
-  (ref, context) async {
-    final email = ref.watch(emailProvider).state;
-    final password = ref.watch(passwordProvider).state;
-    final authMode = ref.watch(authModeProvider).state;
+final firebaseAuthProvider = Provider((ref) => FirebaseAuth.instance);
+
+final authStateChangesProvider =
+    StreamProvider((ref) => ref.watch(firebaseAuthProvider).authStateChanges());
+
+final authMethodProvider = FutureProvider.autoDispose(
+  // ignore: missing_return
+  (ref) async {
+    final firebaseAuth = ref.watch(firebaseAuthProvider);
+
+    final email = ref.read(emailProvider).state;
+    final password = ref.read(passwordProvider).state;
+    final authMode = ref.read(authModeProvider).state;
     try {
       switch (authMode) {
         case AuthMode.SIGNIN:
-          return await _firebaseAuth.signInWithEmailAndPassword(
+          return await firebaseAuth.signInWithEmailAndPassword(
               email: email, password: password);
         case AuthMode.SIGNUP:
-          return await _firebaseAuth.createUserWithEmailAndPassword(
+          return await firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password);
       }
     } on FirebaseAuthException catch (e) {
-      if (ref.watch(authTriggerProvider).state)
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-          ),
-        );
+      return e;
     } finally {
-      ref.watch(authTriggerProvider).state = false;
-      ref.watch(authModeProvider).state = AuthMode.SIGNIN;
-      ref.watch(emailProvider).state = '';
-      ref.watch(passwordProvider).state = '';
+      ref.read(authTriggerProvider).state = false;
+      ref.read(authModeProvider).state = AuthMode.SIGNIN;
+      ref.read(emailProvider).state = '';
+      ref.read(passwordProvider).state = '';
     }
   },
 );
 
-final authStateStream = StreamProvider<User>(
-  (ref) => _firebaseAuth.authStateChanges(),
-);
-
 final isModeratorProvider = FutureProvider.autoDispose<bool>(
   (ref) async {
-    final idTokenResult = await _firebaseAuth.currentUser.getIdTokenResult();
+    final firebaseAuth = ref.watch(firebaseAuthProvider);
+
+    final idTokenResult = await firebaseAuth.currentUser.getIdTokenResult();
     final isModerator = idTokenResult.claims['isModerator'];
     return (isModerator != null) ? isModerator : false;
   },
 );
-
-void signOut() {
-  _firebaseAuth.signOut();
-}

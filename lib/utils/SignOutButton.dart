@@ -10,13 +10,13 @@ class SignOutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(authStateStream).when(
+      builder: (_, watch, __) => watch(authStateChangesProvider).when(
         data: (user) => user != null
             ? IconButton(
-          tooltip: 'Sign out',
-          icon: Icon(Icons.exit_to_app),
-          onPressed: signOut,
-        )
+                tooltip: 'Sign out',
+                icon: Icon(Icons.exit_to_app),
+                onPressed: context.read(firebaseAuthProvider).signOut,
+              )
             : Container(),
         loading: () => Container(),
         error: (_, __) => Container(),

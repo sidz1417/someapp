@@ -35,7 +35,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
     return Consumer(
       builder: (BuildContext context,
           T Function<T>(ProviderBase<Object, T>) watch, _) {
-        return watch(authStateStream).when(
+        return watch(authStateChangesProvider).when(
           data: (user) {
             _isLoggedIn = user != null;
             return Navigator(

@@ -1,7 +1,9 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
 import 'package:someapp/riverpod/Db.dart';
+import 'package:someapp/riverpod/functions.dart';
 import 'package:someapp/utils/AboutDialogButton.dart';
 import 'package:someapp/utils/SignOutButton.dart';
 
@@ -27,12 +29,21 @@ class HomeScreen extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Consumer(
-                builder: (BuildContext context,
-                    T Function<T>(ProviderBase<Object, T>) watch, _) {
+                builder: (_, T Function<T>(ProviderBase<Object, T>) watch, __) {
                   return watch(modTrigger).state
-                      ? watch(modFutureProvider(context)).maybeWhen(
-                          orElse: () => ModeratorButtons(),
-                        )
+                      ? ProviderListener(
+                          provider: modFutureProvider.future,
+                          onChange: (BuildContext context,
+                              Future<Object> value) async {
+                            final returnValue = await value;
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                                content:
+                                    (returnValue is FirebaseFunctionsException)
+                                        ? Text(returnValue.message)
+                                        : Text('$returnValue')));
+                          },
+                          child: watch(modFutureProvider)
+                              .maybeWhen(orElse: () => ModeratorButtons()))
                       : ModeratorButtons();
                 },
               ),
@@ -167,8 +178,7 @@ class CategoryList extends StatelessWidget {
           itemBuilder: (_, index) => Card(
             child: ListTile(
               onTap: () {
-                upVote(
-                    pollName: categoryList[index].pollName, context: context);
+                upVote(pollName: categoryList[index].pollName);
               },
               title: Center(child: Text(categoryList[index].pollName)),
               trailing: Text('${categoryList[index].voteCount}'),
