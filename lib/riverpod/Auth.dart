@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthMode { SIGNIN, SIGNUP }
 
-FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+FirebaseAuth _firebaseAuth = FirebaseAuth.instance
+  ..useEmulator('http://localhost:9099');
 
 final emailProvider = StateProvider((ref) => '');
 final passwordProvider = StateProvider((ref) => '');
@@ -29,7 +30,7 @@ final authFutureProvider = FutureProvider.family<UserCredential?, BuildContext>(
       if (ref.watch(authTriggerProvider).state)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message),
+            content: Text('${e.message}'),
           ),
         );
     } finally {
@@ -47,8 +48,8 @@ final authStateStream = StreamProvider<User?>(
 
 final isModeratorProvider = FutureProvider.autoDispose<bool>(
   (ref) async {
-    final idTokenResult = await _firebaseAuth.currentUser.getIdTokenResult();
-    final isModerator = idTokenResult.claims['isModerator'];
+    final idTokenResult = await _firebaseAuth.currentUser?.getIdTokenResult();
+    final isModerator = idTokenResult?.claims?['isModerator'];
     return (isModerator != null) ? isModerator : false;
   },
 );

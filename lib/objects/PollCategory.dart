@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class PollCategory {
   final String pollName;
@@ -10,6 +9,6 @@ class PollCategory {
   factory PollCategory.fromDb(DocumentSnapshot documentSnapshot) {
     final data = documentSnapshot.data();
     return PollCategory(
-        pollName: documentSnapshot.id, voteCount: data['count']);
+        pollName: documentSnapshot.id, voteCount: data?['count']);
   }
 }

@@ -47,62 +47,65 @@ class LoginScreenContents extends StatelessWidget {
       child: FocusScope(
         node: focusScopeNode,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              EmailTextField(),
-              SomePadding(),
-              PasswordTextField(
-                passwordTextController: passwordTextController,
-              ),
-              SomePadding(),
-              Consumer(
-                builder: (_, watch, __) =>
-                    (watch(authModeProvider).state == AuthMode.SIGNUP)
-                        ? PasswordConfirmTextField(
-                            passwordTextController: passwordTextController)
-                        : Container(),
-              ),
-              SomePadding(),
-              Consumer(
-                builder: (context, watch, _) => ElevatedButton(
-                  child: Text(
-                    '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    if (!formKey.currentState!.validate()) return;
-                    formKey.currentState!.save();
-                    context.read(authTriggerProvider).state = true;
-                    formKey.currentState!.reset();
-                  },
+          child: Container(
+            width: MediaQuery.of(context).size.width / 1.5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                EmailTextField(),
+                SomePadding(),
+                PasswordTextField(
+                  passwordTextController: passwordTextController,
                 ),
-              ),
-              SomePadding(),
-              Consumer(
-                builder: (context, watch, _) {
-                  final authMode = watch(authModeProvider).state;
-                  return ElevatedButton(
+                SomePadding(),
+                Consumer(
+                  builder: (_, watch, __) =>
+                      (watch(authModeProvider).state == AuthMode.SIGNUP)
+                          ? PasswordConfirmTextField(
+                              passwordTextController: passwordTextController)
+                          : Container(),
+                ),
+                SomePadding(),
+                Consumer(
+                  builder: (context, watch, _) => ElevatedButton(
                     child: Text(
-                      '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
+                      '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
                     onPressed: () {
-                      (authMode == AuthMode.SIGNIN)
-                          ? context.read(authModeProvider).state =
-                              AuthMode.SIGNUP
-                          : context.read(authModeProvider).state =
-                              AuthMode.SIGNIN;
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      if (!formKey.currentState!.validate()) return;
+                      formKey.currentState!.save();
+                      context.read(authTriggerProvider).state = true;
+                      formKey.currentState!.reset();
                     },
-                  );
-                },
-              )
-            ],
+                  ),
+                ),
+                SomePadding(),
+                Consumer(
+                  builder: (context, watch, _) {
+                    final authMode = watch(authModeProvider).state;
+                    return ElevatedButton(
+                      child: Text(
+                        '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      onPressed: () {
+                        (authMode == AuthMode.SIGNIN)
+                            ? context.read(authModeProvider).state =
+                                AuthMode.SIGNUP
+                            : context.read(authModeProvider).state =
+                                AuthMode.SIGNIN;
+                      },
+                    );
+                  },
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -132,12 +135,11 @@ class EmailTextField extends StatelessWidget {
         labelStyle: TextStyle(color: Theme.of(context).accentColor),
       ),
       keyboardType: TextInputType.emailAddress,
-      // ignore: missing_return
       validator: (email) {
         if (email != null && email.isEmpty) return 'Email cannot be blank';
       },
       onSaved: (String? email) {
-        context.read(emailProvider).state = email;
+        if (email != null) context.read(emailProvider).state = email;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -162,10 +164,9 @@ class PasswordTextField extends StatelessWidget {
       ),
       obscureText: true,
       onSaved: (String? password) {
-        context.read(passwordProvider).state = password;
+        if (password != null) context.read(passwordProvider).state = password;
       },
       controller: passwordTextController,
-      // ignore: missing_return
       validator: (String? password) {
         if (password == null || password.length < 6)
           return "Minimum password length is 6";
@@ -192,7 +193,6 @@ class PasswordConfirmTextField extends StatelessWidget {
         labelStyle: TextStyle(color: Theme.of(context).accentColor),
       ),
       obscureText: true,
-      // ignore: missing_return
       validator: (String? password) {
         if (passwordTextController.text != password)
           return 'Passwords do not match';

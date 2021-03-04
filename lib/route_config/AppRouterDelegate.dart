@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/all.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
 import 'package:someapp/route_config/AppRoute.dart';
 import 'package:someapp/screens/HomeScreen.dart';
