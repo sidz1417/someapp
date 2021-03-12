@@ -1,7 +1,9 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
 import 'package:someapp/riverpod/Db.dart';
+import 'package:someapp/riverpod/functions.dart';
 import 'package:someapp/utils/AboutDialogButton.dart';
 import 'package:someapp/utils/SignOutButton.dart';
 
@@ -25,17 +27,28 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 60.0),
             child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Consumer(
-                builder: (context, watch, _) {
-                  return watch(modTrigger).state
-                      ? watch(modFutureProvider(context)).maybeWhen(
-                          orElse: () => ModeratorButtons(),
-                        )
-                      : ModeratorButtons();
-                },
-              ),
-            ),
+                alignment: Alignment.bottomCenter,
+                child: Consumer(
+                  builder: (context, watch, _) {
+                    return watch(modTrigger).state
+                        ? ProviderListener(
+                            provider: modFutureProvider.future,
+                            onChange: (BuildContext context,
+                                Future<dynamic> modFuture) async {
+                              final returnVal = await modFuture;
+                              if (returnVal is FirebaseFunctionsException) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text('${returnVal.message}')));
+                              }
+                            },
+                            child: watch(modFutureProvider).maybeWhen(
+                              orElse: () => ModeratorButtons(),
+                            ),
+                          )
+                        : ModeratorButtons();
+                  },
+                )),
           )
         ],
       ),
@@ -166,9 +179,7 @@ class CategoryList extends StatelessWidget {
               itemBuilder: (_, index) => Card(
                 child: ListTile(
                   onTap: () {
-                    upVote(
-                        pollName: categoryList[index].pollName,
-                        context: context);
+                    upVote(pollName: categoryList[index].pollName);
                   },
                   title: Center(child: Text(categoryList[index].pollName)),
                   trailing: Text('${categoryList[index].voteCount}'),

@@ -12,15 +12,17 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^1.0.0
-  firebase_auth: ^1.0.0
-  flutter_riverpod: ^0.13.0-nullsafety.3 
+  firebase_core: ^1.0.1
+  firebase_auth: ^1.0.1
+  flutter_riverpod: ^0.13.1
   cloud_functions: ^1.0.0
-  cloud_firestore: ^1.0.0
+  cloud_firestore: ^1.0.1
 
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test: 
     sdk: flutter
 
 flutter:
