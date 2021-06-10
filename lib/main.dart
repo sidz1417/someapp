@@ -8,7 +8,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
-    ProviderScope(
+    MyApp(),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Flutter App',
@@ -19,6 +30,6 @@ void main() async {
         routeInformationParser: AppRouteInformationParser(),
         routerDelegate: AppRouterDelegate(),
       ),
-    ),
-  );
+    );
+  }
 }
