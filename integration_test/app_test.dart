@@ -7,13 +7,28 @@ import 'package:someapp/screens/HomeScreen.dart';
 import 'package:someapp/screens/LoginScreen.dart';
 import 'package:someapp/utils/SignOutButton.dart';
 
+// firebase emulators:start --only auth,functions,firestore --import=test/testData
+
+// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d 23199AD8-F942-4956-9C8C-47E5DE45E6B1
+// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d macos
+// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=chrome
+// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=safari
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Auth tests', () {
-    // tearDown(() {
-    //   test_auth.signOut();
-    // });
+    tearDown(() {
+      test_auth.signOut();
+    });
+
+    testWidgets("Login screen showed for unauthenticated user",
+        (WidgetTester tester) async {
+      await initialize(tester);
+
+      expect(find.byType(LoginScreen), findsOneWidget);
+      expect(find.byType(HomeScreen), findsNothing);
+    }, skip: false);
 
     testWidgets("Auth flow for valid user", (WidgetTester tester) async {
       await initialize(tester);
@@ -31,14 +46,6 @@ void main() {
 
       await tester.tap(find.byType(SignOutButton));
       await tester.pumpAndSettle();
-
-      expect(find.byType(LoginScreen), findsOneWidget);
-      expect(find.byType(HomeScreen), findsNothing);
-    }, skip: false);
-
-    testWidgets("Login screen showed for unauthenticated user",
-        (WidgetTester tester) async {
-      await initialize(tester);
 
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(find.byType(HomeScreen), findsNothing);
