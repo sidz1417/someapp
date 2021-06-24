@@ -50,6 +50,37 @@ void main() {
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(find.byType(HomeScreen), findsNothing);
     }, skip: false);
+
+    testWidgets('Moderator has moderator buttons', (WidgetTester tester) async {
+      await initialize(tester);
+
+      await tester.enterText(find.byType(EmailTextField), 'moduser@email.com');
+      await tester.enterText(find.byType(PasswordTextField), '11111111');
+      await tester.tap(find.text('Sign In'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(find.byType(HomeScreen), findsOneWidget);
+
+      expect(find.byType(AddCategoryButton), findsOneWidget);
+      expect(find.byType(RemoveCategoryButton), findsOneWidget);
+    }, skip: false);
+
+    testWidgets('User does not have moderator buttons',
+        (WidgetTester tester) async {
+      await initialize(tester);
+
+      await tester.enterText(find.byType(EmailTextField), 'user@email.com');
+      await tester.enterText(find.byType(PasswordTextField), '11111111');
+      await tester.tap(find.text('Sign In'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(find.byType(HomeScreen), findsOneWidget);
+
+      expect(find.byType(AddCategoryButton), findsNothing);
+      expect(find.byType(RemoveCategoryButton), findsNothing);
+    }, skip: false);
   }, skip: false);
 }
 
