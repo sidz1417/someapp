@@ -95,6 +95,7 @@ class AddCategoryButton extends StatelessWidget {
           return AlertDialog(
             title: Text('Add category'),
             content: TextField(
+              key: Key('AddCategoryText'),
               controller: _textEditingController,
               decoration: InputDecoration(hintText: 'Enter new category name'),
             ),
@@ -138,6 +139,7 @@ class RemoveCategoryButton extends StatelessWidget {
           return AlertDialog(
             title: Text('Remove category'),
             content: TextField(
+              key: Key('RemoveCategoryText'),
               controller: _textEditingController,
               decoration: InputDecoration(
                   hintText: 'Enter the category name to remove'),
@@ -176,19 +178,38 @@ class CategoryList extends StatelessWidget {
       builder: ((_, watch, __) => watch(categoryStream).when(
             data: (categoryList) => ListView.builder(
               itemCount: categoryList.length,
-              itemBuilder: (_, index) => Card(
-                child: ListTile(
-                  onTap: () {
-                    upVote(pollName: categoryList[index].pollName);
-                  },
-                  title: Center(child: Text(categoryList[index].pollName)),
-                  trailing: Text('${categoryList[index].voteCount}'),
-                ),
+              itemBuilder: (_, index) => CategoryItem(
+                pollName: categoryList[index].pollName,
+                voteCount: categoryList[index].voteCount,
               ),
             ),
             loading: () => Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error getting data : $e'),
           )),
+    );
+  }
+}
+
+class CategoryItem extends StatelessWidget {
+  final pollName;
+  final voteCount;
+
+  const CategoryItem({
+    Key? key,
+    required this.pollName,
+    required this.voteCount,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        onTap: () {
+          upVote(pollName: pollName);
+        },
+        title: Center(child: Text(pollName)),
+        trailing: Text('$voteCount'),
+      ),
     );
   }
 }
