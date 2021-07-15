@@ -2,7 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 FirebaseFunctions _firebaseFunctions = FirebaseFunctions.instance
-  ..useFunctionsEmulator(origin: 'http://localhost:5001');
+  ..useFunctionsEmulator('localhost', 5001);
 
 upVote({required String pollName}) async {
   try {

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum AuthMode { SIGNIN, SIGNUP }
 
 FirebaseAuth _firebaseAuth = FirebaseAuth.instance
-  ..useEmulator('http://localhost:9099');
+  ..useAuthEmulator('localhost', 9099);
 
 final emailProvider = StateProvider((ref) => '');
 final passwordProvider = StateProvider((ref) => '');
