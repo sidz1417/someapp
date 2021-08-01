@@ -10,6 +10,9 @@ import 'test_utils.dart';
 //start emulators with testdata
 // firebase emulators:start --only auth,functions,firestore --import=test/testData
 
+//Pixel 3a testing (arm64 emulator)
+// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d emulator-5554
+
 //iphone 12 pro max testing
 // f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d 23199AD8-F942-4956-9C8C-47E5DE45E6B1
 
