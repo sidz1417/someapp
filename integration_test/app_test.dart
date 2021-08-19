@@ -10,7 +10,7 @@ import 'test_utils.dart';
 //start emulators with testdata
 // firebase emulators:start --only auth,functions,firestore --import=test/testData
 
-//Pixel 3a testing (arm64 emulator)
+//Pixel 3a testing on Android 11(arm64 emulator)
 // f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d emulator-5554
 
 //iphone 12 pro max testing
@@ -103,11 +103,14 @@ void main() {
       await tapTile(tester, pollName: 'jazz');
       await tapTile(tester, pollName: 'jazz');
       await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
 
       expect(tester.widgetList(find.byType(CategoryItem)), [
         isA<CategoryItem>()
             .having((s) => s.pollName, 'jazz pollname', 'jazz')
-            .having((s) => s.voteCount, 'jazz votecount', 3),
+            .having((s) => s.voteCount, 'jazz votecount', 6),
         isA<CategoryItem>()
             .having((s) => s.pollName, 'rock pollname', 'rock')
             .having((s) => s.voteCount, 'rock votecount', 0)

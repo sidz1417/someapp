@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:someapp/main.dart';
@@ -49,9 +50,15 @@ Future<void> initialize(WidgetTester tester) async {
 }
 
 Future<void> clearFirestoreData() async {
-  const DELETE_URL =
-      "http://localhost:8080/emulator/v1/projects/testproject2-1ed80/databases/(default)/documents";
-  await http.delete(Uri.parse(DELETE_URL));
+  var deleteUrl;
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    deleteUrl =
+        "http://10.0.2.2:8080/emulator/v1/projects/testproject2-1ed80/databases/(default)/documents";
+  } else {
+    deleteUrl =
+        "http://localhost:8080/emulator/v1/projects/testproject2-1ed80/databases/(default)/documents";
+  }
+  await http.delete(Uri.parse(deleteUrl));
 }
 
 void isLoginScreen() {
