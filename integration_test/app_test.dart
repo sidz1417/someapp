@@ -95,28 +95,6 @@ void main() {
       await clearFirestoreData();
     });
 
-    testWidgets('User can upvote', (tester) async {
-      await initialize(tester);
-
-      await signInAsUser(tester);
-
-      await tapTile(tester, pollName: 'jazz');
-      await tapTile(tester, pollName: 'jazz');
-      await tapTile(tester, pollName: 'jazz');
-      await tapTile(tester, pollName: 'jazz');
-      await tapTile(tester, pollName: 'jazz');
-      await tapTile(tester, pollName: 'jazz');
-
-      expect(tester.widgetList(find.byType(CategoryItem)), [
-        isA<CategoryItem>()
-            .having((s) => s.pollName, 'jazz pollname', 'jazz')
-            .having((s) => s.voteCount, 'jazz votecount', 6),
-        isA<CategoryItem>()
-            .having((s) => s.pollName, 'rock pollname', 'rock')
-            .having((s) => s.voteCount, 'rock votecount', 0)
-      ]);
-    }, skip: true);
-
     testWidgets('Moderator can add & remove polls', (tester) async {
       await initialize(tester);
 
@@ -177,6 +155,27 @@ void main() {
         isA<CategoryItem>()
             .having((s) => s.pollName, 'rock pollname', 'rock')
             .having((s) => s.voteCount, 'rock votecount', 0),
+      ]);
+    }, skip: skipTests);
+
+    testWidgets('User can upvote', (tester) async {
+      await initialize(tester);
+
+      await signInAsModerator(tester);
+
+      await addCategory(tester, pollName: 'jazz');
+
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+      await tapTile(tester, pollName: 'jazz');
+
+      expect(tester.widgetList(find.byType(CategoryItem)), [
+        isA<CategoryItem>()
+            .having((s) => s.pollName, 'jazz pollname', 'jazz')
+            .having((s) => s.voteCount, 'jazz votecount', 6),
       ]);
     }, skip: skipTests);
   }, skip: skipTests);
