@@ -11,13 +11,13 @@ import 'test_utils.dart';
 // firebase emulators:start --only auth,functions,firestore --import=test/testData
 
 //Pixel 3a testing on Android 11(arm64 emulator)
-// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d emulator-5554
+// f test integration_test/app_test.dart -d emulator-5554
 
-//iphone 12 pro max testing
-// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d 23199AD8-F942-4956-9C8C-47E5DE45E6B1
+//iphone 13 testing
+// f test integration_test/app_test.dart -d F522EC54-07CB-4F29-AE70-2ECCACED06A3
 
 //macos testing
-// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d macos
+// f test integration_test/app_test.dart -d macos
 
 //chrome testing
 // f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=chrome --no-headless
@@ -115,7 +115,7 @@ void main() {
             .having((s) => s.pollName, 'rock pollname', 'rock')
             .having((s) => s.voteCount, 'rock votecount', 0)
       ]);
-    }, skip: skipTests);
+    }, skip: true);
 
     testWidgets('Moderator can add & remove polls', (tester) async {
       await initialize(tester);
