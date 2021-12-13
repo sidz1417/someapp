@@ -130,9 +130,10 @@ class EmailTextField extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).accentColor)),
+            borderSide:
+                BorderSide(color: Theme.of(context).colorScheme.secondary)),
         labelText: "Enter E-mail",
-        labelStyle: TextStyle(color: Theme.of(context).accentColor),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
       ),
       keyboardType: TextInputType.emailAddress,
       validator: (email) {
@@ -158,9 +159,10 @@ class PasswordTextField extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).accentColor)),
+            borderSide:
+                BorderSide(color: Theme.of(context).colorScheme.secondary)),
         labelText: "Enter Password",
-        labelStyle: TextStyle(color: Theme.of(context).accentColor),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
       ),
       obscureText: true,
       onSaved: (String? password) {
@@ -188,9 +190,10 @@ class PasswordConfirmTextField extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).accentColor)),
+            borderSide:
+                BorderSide(color: Theme.of(context).colorScheme.secondary)),
         labelText: "Confirm password",
-        labelStyle: TextStyle(color: Theme.of(context).accentColor),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
       ),
       obscureText: true,
       validator: (String? password) {
