@@ -20,10 +20,10 @@ import 'test_utils.dart';
 // f test integration_test/app_test.dart -d macos
 
 //chrome testing
-// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=chrome --no-headless
+// chromedriver --port=4444 | f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=chrome --no-headless
 
 //safari testing
-// f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=safari
+// safaridriver --port=4444 | f drive --target=integration_test/app_test.dart --driver=integration_driver/integration_test.dart -d web-server --browser-name=safari
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
