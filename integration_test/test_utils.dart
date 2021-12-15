@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:someapp/firebase_options.dart';
 import 'package:someapp/main.dart';
 import 'package:someapp/screens/HomeScreen.dart';
 import 'package:someapp/screens/LoginScreen.dart';
@@ -43,7 +44,9 @@ Future<void> signInAsUser(WidgetTester tester) async {
 }
 
 Future<void> initialize(WidgetTester tester) async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await tester.pumpWidget(MyApp());
   await tester.pumpAndSettle();
 }
