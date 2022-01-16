@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 FirebaseFunctions _firebaseFunctions = FirebaseFunctions.instance
@@ -18,14 +19,15 @@ upVote({required String pollName}) async {
 
 enum ModMode { CREATE, REMOVE }
 
-final modModeProvider = StateProvider((ref) => ModMode.CREATE);
-final modTrigger = StateProvider((ref) => false);
-final pollNameProvider = StateProvider((ref) => '');
+final modModeProvider = StateProvider<ModMode>((ref) => ModMode.CREATE);
+final modTrigger = StateProvider<bool>((ref) => false);
+final pollNameProvider = StateProvider<String>((ref) => '');
 
-final modFutureProvider = FutureProvider.autoDispose<dynamic>(
-  (ref) async {
-    final modMode = ref.read(modModeProvider).state;
-    final pollName = ref.read(pollNameProvider).state;
+final modFutureProvider =
+    FutureProvider.autoDispose.family<dynamic, BuildContext>(
+  (ref, context) async {
+    final modMode = ref.watch(modModeProvider.notifier).state;
+    final pollName = ref.watch(pollNameProvider.notifier).state;
     try {
       switch (modMode) {
         case ModMode.CREATE:
@@ -42,9 +44,11 @@ final modFutureProvider = FutureProvider.autoDispose<dynamic>(
               .call(<String, dynamic>{'categoryName': pollName});
       }
     } on FirebaseFunctionsException catch (e) {
-      return e;
+      if (ref.watch(modTrigger.notifier).state)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('${e.message}')));
     } finally {
-      ref.read(modTrigger).state = false;
+      ref.watch(modTrigger.notifier).state = false;
     }
   },
 );
