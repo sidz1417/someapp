@@ -135,6 +135,7 @@ class EmailTextField extends ConsumerWidget {
       keyboardType: TextInputType.emailAddress,
       validator: (email) {
         if (email != null && email.isEmpty) return 'Email cannot be blank';
+        return null;
       },
       onSaved: (String? email) {
         if (email != null) ref.watch(emailProvider.notifier).state = email;
@@ -170,6 +171,7 @@ class PasswordTextField extends ConsumerWidget {
       validator: (String? password) {
         if (password == null || password.length < 6)
           return "Minimum password length is 6";
+        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -197,6 +199,7 @@ class PasswordConfirmTextField extends StatelessWidget {
       validator: (String? password) {
         if (passwordTextController.text != password)
           return 'Passwords do not match';
+        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),

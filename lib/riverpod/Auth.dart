@@ -39,6 +39,7 @@ final authFutureProvider = FutureProvider.family<UserCredential?, BuildContext>(
       ref.watch(emailProvider.notifier).state = '';
       ref.watch(passwordProvider.notifier).state = '';
     }
+    return null;
   },
 );
 
