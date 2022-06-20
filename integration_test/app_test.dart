@@ -87,7 +87,7 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
       isLoginScreen();
     }, skip: skipTests);
-  }, skip: skipTests);
+  }, skip: false);
 
   group('Db tests', () {
     tearDown(() async {
@@ -178,5 +178,5 @@ void main() {
             .having((s) => s.voteCount, 'jazz votecount', 6),
       ]);
     }, skip: skipTests);
-  }, skip: skipTests);
+  }, skip: false);
 }

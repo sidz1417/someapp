@@ -10,7 +10,7 @@ class SignOutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (_, watch, __) => watch(authStateStream).when(
+      builder: (_, ref, __) => ref.watch(authStateStream).when(
         data: (user) => user != null
             ? IconButton(
           tooltip: 'Sign out',

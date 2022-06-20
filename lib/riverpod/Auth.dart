@@ -7,16 +7,16 @@ enum AuthMode { SIGNIN, SIGNUP }
 FirebaseAuth _firebaseAuth = FirebaseAuth.instance
   ..useAuthEmulator('localhost', 9099);
 
-final emailProvider = StateProvider((ref) => '');
-final passwordProvider = StateProvider((ref) => '');
-final authModeProvider = StateProvider((ref) => AuthMode.SIGNIN);
-final authTriggerProvider = StateProvider((ref) => false);
+final emailProvider = StateProvider<String>((ref) => '');
+final passwordProvider = StateProvider<String>((ref) => '');
+final authModeProvider = StateProvider<AuthMode>((ref) => AuthMode.SIGNIN);
+final authTriggerProvider = StateProvider<bool>((ref) => false);
 
 final authFutureProvider = FutureProvider.family<UserCredential?, BuildContext>(
   (ref, context) async {
-    final email = ref.watch(emailProvider).state;
-    final password = ref.watch(passwordProvider).state;
-    final authMode = ref.watch(authModeProvider).state;
+    final email = ref.watch(emailProvider.notifier).state;
+    final password = ref.watch(passwordProvider.notifier).state;
+    final authMode = ref.watch(authModeProvider.notifier).state;
     try {
       switch (authMode) {
         case AuthMode.SIGNIN:
@@ -27,18 +27,19 @@ final authFutureProvider = FutureProvider.family<UserCredential?, BuildContext>(
               email: email, password: password);
       }
     } on FirebaseAuthException catch (e) {
-      if (ref.watch(authTriggerProvider).state)
+      if (ref.watch(authTriggerProvider.notifier).state)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${e.message}'),
           ),
         );
     } finally {
-      ref.watch(authTriggerProvider).state = false;
-      ref.watch(authModeProvider).state = AuthMode.SIGNIN;
-      ref.watch(emailProvider).state = '';
-      ref.watch(passwordProvider).state = '';
+      ref.watch(authTriggerProvider.notifier).state = false;
+      ref.watch(authModeProvider.notifier).state = AuthMode.SIGNIN;
+      ref.watch(emailProvider.notifier).state = '';
+      ref.watch(passwordProvider.notifier).state = '';
     }
+    return null;
   },
 );
 

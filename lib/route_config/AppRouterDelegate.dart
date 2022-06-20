@@ -33,41 +33,40 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (BuildContext context,
-          T Function<T>(ProviderBase<Object, T>) watch, _) {
-        return watch(authStateStream).when(
-          data: (user) {
-            _isLoggedIn = user != null;
-            return Navigator(
-              pages: [
-                if (_show404)
-                  MaterialPage(child: UnknownScreen())
-                else if (_isLoggedIn)
-                  MaterialPage(child: HomeScreen())
-                else if (!_isLoggedIn)
-                  MaterialPage(
-                    child: Scaffold(
-                      appBar: AppBar(
-                        title: Text('Flutter App'),
-                        centerTitle: true,
-                        leading: AboutDialogButton(),
-                      ),
-                      body: LoginScreen(),
-                    ),
-                  )
-              ],
-              onPopPage: (route, result) {
-                if (!route.didPop(result)) return false;
-                return true;
+      builder: (BuildContext context, ref, _) {
+        return ref.watch(authStateStream).when(
+              data: (user) {
+                _isLoggedIn = user != null;
+                return Navigator(
+                  pages: [
+                    if (_show404)
+                      MaterialPage(child: UnknownScreen())
+                    else if (_isLoggedIn)
+                      MaterialPage(child: HomeScreen())
+                    else if (!_isLoggedIn)
+                      MaterialPage(
+                        child: Scaffold(
+                          appBar: AppBar(
+                            title: Text('Flutter App'),
+                            centerTitle: true,
+                            leading: AboutDialogButton(),
+                          ),
+                          body: LoginScreen(),
+                        ),
+                      )
+                  ],
+                  onPopPage: (route, result) {
+                    if (!route.didPop(result)) return false;
+                    return true;
+                  },
+                );
               },
+              loading: () => Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, _) => Scaffold(
+                  body: Center(child: Text('Error getting user $err'))),
             );
-          },
-          loading: () => Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          ),
-          error: (err, _) =>
-              Scaffold(body: Center(child: Text('Error getting user $err'))),
-        );
       },
     );
   }

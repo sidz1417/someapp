@@ -4,23 +4,19 @@ import 'package:someapp/riverpod/Auth.dart';
 
 class LoginScreen extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     final TextEditingController _passwordTextController =
         TextEditingController();
     return Center(
-      child: (watch(authTriggerProvider).state)
-          ? watch(authFutureProvider(context)).when(
-              data: (_) => LoginScreenContents(
-                formKey: _formKey,
-                passwordTextController: _passwordTextController,
-              ),
-              loading: () => CircularProgressIndicator(),
-              error: (_, __) => LoginScreenContents(
-                formKey: _formKey,
-                passwordTextController: _passwordTextController,
-              ),
-            )
+      child: (ref.watch(authTriggerProvider.state).state)
+          ? ref.watch(authFutureProvider(context)).maybeWhen(
+                loading: () => CircularProgressIndicator(),
+                orElse: () => LoginScreenContents(
+                  formKey: _formKey,
+                  passwordTextController: _passwordTextController,
+                ),
+              )
           : LoginScreenContents(
               formKey: _formKey,
               passwordTextController: _passwordTextController,
@@ -29,7 +25,7 @@ class LoginScreen extends ConsumerWidget {
   }
 }
 
-class LoginScreenContents extends StatelessWidget {
+class LoginScreenContents extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordTextController;
 
@@ -41,7 +37,7 @@ class LoginScreenContents extends StatelessWidget {
   final FocusScopeNode focusScopeNode = FocusScopeNode();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Form(
       key: formKey,
       child: FocusScope(
@@ -59,17 +55,18 @@ class LoginScreenContents extends StatelessWidget {
                 ),
                 SomePadding(),
                 Consumer(
-                  builder: (_, watch, __) =>
-                      (watch(authModeProvider).state == AuthMode.SIGNUP)
+                  builder: (_, ref, __) =>
+                      (ref.watch(authModeProvider.state).state ==
+                              AuthMode.SIGNUP)
                           ? PasswordConfirmTextField(
                               passwordTextController: passwordTextController)
                           : Container(),
                 ),
                 SomePadding(),
                 Consumer(
-                  builder: (context, watch, _) => ElevatedButton(
+                  builder: (context, ref, _) => ElevatedButton(
                     child: Text(
-                      '${watch(authModeProvider).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
+                      '${ref.watch(authModeProvider.state).state == AuthMode.SIGNIN ? 'Sign In' : 'Sign Up'}',
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -78,15 +75,15 @@ class LoginScreenContents extends StatelessWidget {
                       FocusScope.of(context).requestFocus(new FocusNode());
                       if (!formKey.currentState!.validate()) return;
                       formKey.currentState!.save();
-                      context.read(authTriggerProvider).state = true;
+                      ref.watch(authTriggerProvider.notifier).state = true;
                       formKey.currentState!.reset();
                     },
                   ),
                 ),
                 SomePadding(),
                 Consumer(
-                  builder: (context, watch, _) {
-                    final authMode = watch(authModeProvider).state;
+                  builder: (context, ref, _) {
+                    final authMode = ref.watch(authModeProvider.state).state;
                     return ElevatedButton(
                       child: Text(
                         '${authMode == AuthMode.SIGNIN ? 'Switch to Sign Up' : 'Switch to Sign In'}',
@@ -96,9 +93,9 @@ class LoginScreenContents extends StatelessWidget {
                       ),
                       onPressed: () {
                         (authMode == AuthMode.SIGNIN)
-                            ? context.read(authModeProvider).state =
+                            ? ref.watch(authModeProvider.notifier).state =
                                 AuthMode.SIGNUP
-                            : context.read(authModeProvider).state =
+                            : ref.watch(authModeProvider.notifier).state =
                                 AuthMode.SIGNIN;
                       },
                     );
@@ -122,9 +119,9 @@ class SomePadding extends StatelessWidget {
   }
 }
 
-class EmailTextField extends StatelessWidget {
+class EmailTextField extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       autofocus: true,
       decoration: InputDecoration(
@@ -138,9 +135,10 @@ class EmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       validator: (email) {
         if (email != null && email.isEmpty) return 'Email cannot be blank';
+        return null;
       },
       onSaved: (String? email) {
-        if (email != null) context.read(emailProvider).state = email;
+        if (email != null) ref.watch(emailProvider.notifier).state = email;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -148,13 +146,13 @@ class EmailTextField extends StatelessWidget {
   }
 }
 
-class PasswordTextField extends StatelessWidget {
+class PasswordTextField extends ConsumerWidget {
   final TextEditingController passwordTextController;
 
   PasswordTextField({required this.passwordTextController});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       decoration: InputDecoration(
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
@@ -166,12 +164,14 @@ class PasswordTextField extends StatelessWidget {
       ),
       obscureText: true,
       onSaved: (String? password) {
-        if (password != null) context.read(passwordProvider).state = password;
+        if (password != null)
+          ref.watch(passwordProvider.notifier).state = password;
       },
       controller: passwordTextController,
       validator: (String? password) {
         if (password == null || password.length < 6)
           return "Minimum password length is 6";
+        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -199,6 +199,7 @@ class PasswordConfirmTextField extends StatelessWidget {
       validator: (String? password) {
         if (passwordTextController.text != password)
           return 'Passwords do not match';
+        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),

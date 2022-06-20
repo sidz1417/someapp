@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:someapp/riverpod/Auth.dart';
@@ -19,39 +18,34 @@ class HomeScreen extends StatelessWidget {
           SignOutButton(),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CategoryList(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 60.0),
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Consumer(
-                  builder: (context, watch, _) {
-                    return watch(modTrigger).state
-                        ? ProviderListener(
-                            provider: modFutureProvider.future,
-                            onChange: (BuildContext context,
-                                Future<dynamic> modFuture) async {
-                              final returnVal = await modFuture;
-                              if (returnVal is FirebaseFunctionsException) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('${returnVal.message}')));
-                              }
-                            },
-                            child: watch(modFutureProvider).maybeWhen(
-                              orElse: () => ModeratorButtons(),
-                            ),
-                          )
-                        : ModeratorButtons();
-                  },
-                )),
-          )
-        ],
-      ),
+      body: Stack(children: [
+        Positioned.fill(
+          child: CategoryList(),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 60.0),
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  // final triggered = ref.watch(modTrigger.state).state;
+                  // if (triggered)
+                  //   ref.listen(modFutureProvider.future,
+                  //       (previous, Future<dynamic> modFuture) async {
+                  //     final returnVal = await modFuture;
+                  //     if (returnVal is FirebaseFunctionsException) {
+                  //       ScaffoldMessenger.of(context).showSnackBar(
+                  //           SnackBar(content: Text('${returnVal.message}')));
+                  //     }
+                  //   });
+                  // return ModeratorButtons();
+                  if (ref.watch(modTrigger.state).state)
+                    ref.watch(modFutureProvider(context));
+                  return ModeratorButtons();
+                },
+              )),
+        )
+      ]),
     );
   }
 }
@@ -64,7 +58,7 @@ class ModeratorButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: ((_, watch, __) => watch(isModeratorProvider).when(
+      builder: ((_, ref, __) => ref.watch(isModeratorProvider).when(
             data: (isModerator) => isModerator
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -104,16 +98,18 @@ class AddCategoryButton extends StatelessWidget {
                 child: Text('Cancel'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              ElevatedButton(
-                child: Text('Add'),
-                onPressed: () {
-                  context.read(pollNameProvider).state =
-                      _textEditingController.text;
-                  context.read(modModeProvider).state = ModMode.CREATE;
-                  context.read(modTrigger).state = true;
-                  Navigator.of(context).pop();
-                },
-              ),
+              Consumer(
+                  builder: (_, ref, __) => ElevatedButton(
+                        child: Text('Add'),
+                        onPressed: () {
+                          ref.watch(pollNameProvider.notifier).state =
+                              _textEditingController.text;
+                          ref.watch(modModeProvider.notifier).state =
+                              ModMode.CREATE;
+                          ref.watch(modTrigger.notifier).state = true;
+                          Navigator.of(context).pop();
+                        },
+                      )),
             ],
           );
         },
@@ -149,16 +145,18 @@ class RemoveCategoryButton extends StatelessWidget {
                 child: Text('Cancel'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              ElevatedButton(
-                child: Text('Remove'),
-                onPressed: () {
-                  context.read(pollNameProvider).state =
-                      _textEditingController.text;
-                  context.read(modModeProvider).state = ModMode.REMOVE;
-                  context.read(modTrigger).state = true;
-                  Navigator.of(context).pop();
-                },
-              ),
+              Consumer(
+                  builder: (_, ref, __) => ElevatedButton(
+                        child: Text('Remove'),
+                        onPressed: () {
+                          ref.watch(pollNameProvider.notifier).state =
+                              _textEditingController.text;
+                          ref.watch(modModeProvider.notifier).state =
+                              ModMode.REMOVE;
+                          ref.watch(modTrigger.notifier).state = true;
+                          Navigator.of(context).pop();
+                        },
+                      )),
             ],
           );
         },
@@ -175,7 +173,7 @@ class CategoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: ((_, watch, __) => watch(categoryStream).when(
+      builder: ((_, ref, __) => ref.watch(categoryStream).when(
             data: (categoryList) => ListView.builder(
               itemCount: categoryList.length,
               itemBuilder: (_, index) => CategoryItem(
