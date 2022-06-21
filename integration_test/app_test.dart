@@ -13,8 +13,8 @@ import 'test_utils.dart';
 //Pixel 3a testing on Android 11(arm64 emulator)
 // f test integration_test/app_test.dart -d emulator-5554
 
-//iphone 13 testing
-// f test integration_test/app_test.dart -d EB0BCEE2-119B-42B7-B006-6B015BEE4412
+//iphone testing
+// f test integration_test/app_test.dart -d <IOS DEVICE ID>
 
 //macos testing
 // f test integration_test/app_test.dart -d macos
