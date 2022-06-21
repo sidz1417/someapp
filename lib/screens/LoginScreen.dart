@@ -133,9 +133,9 @@ class EmailTextField extends ConsumerWidget {
         labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
       ),
       keyboardType: TextInputType.emailAddress,
+      // ignore: body_might_complete_normally_nullable
       validator: (email) {
         if (email != null && email.isEmpty) return 'Email cannot be blank';
-        return null;
       },
       onSaved: (String? email) {
         if (email != null) ref.watch(emailProvider.notifier).state = email;
@@ -168,10 +168,10 @@ class PasswordTextField extends ConsumerWidget {
           ref.watch(passwordProvider.notifier).state = password;
       },
       controller: passwordTextController,
+      // ignore: body_might_complete_normally_nullable
       validator: (String? password) {
         if (password == null || password.length < 6)
           return "Minimum password length is 6";
-        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -196,10 +196,10 @@ class PasswordConfirmTextField extends StatelessWidget {
         labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
       ),
       obscureText: true,
+      // ignore: body_might_complete_normally_nullable
       validator: (String? password) {
         if (passwordTextController.text != password)
           return 'Passwords do not match';
-        return null;
       },
       textInputAction: TextInputAction.next,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
