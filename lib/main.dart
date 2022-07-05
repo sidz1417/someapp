@@ -5,7 +5,10 @@ import 'package:someapp/route_config/AppRouteInformationParser.dart';
 import 'package:someapp/route_config/AppRouterDelegate.dart';
 import 'package:someapp/firebase_options.dart';
 
+import 'urlStrategy/url_strategy.dart';
+
 void main() async {
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
